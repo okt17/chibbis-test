@@ -1,3 +1,7 @@
-// add more exports to get rid of the Eslint's prefer-default-export
-// eslint-disable-next-line import/prefer-default-export
 export const FETCH_REVIEWS = 'FETCH_REVIEWS';
+
+export const SET_REVIEWS = 'SET_REVIEWS';
+
+export const SET_REVIEW_TYPE = 'SET_REVIEW_TYPE';
+
+export const SET_PAGINATION = 'SET_PAGINATION';

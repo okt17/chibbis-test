@@ -4,26 +4,28 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import ReviewItem from './ReviewItem';
 import './style';
 
-const PAGE_SIZE = 10;
-
 class Reviews extends React.PureComponent {
   static propTypes = {
     fetchReviews: PropTypes.func.isRequired,
     reviews: PropTypes.array.isRequired,
+    pagination: PropTypes.object.isRequired,
   };
+  componentDidMount() {
+    this.props.fetchReviews();
+  }
   render() {
     const { reviews } = this.props;
 
     return (
       <div className='app__reviews'>
-        <InfiniteScroll
+        {/* <InfiniteScroll
           dataLength={reviews.length}
           // next = this.fetchData
           // hasMore // next page from pagind headers
-        >
-          {reviews.map(review => <ReviewItem key={review.id} review={review} />)}
-        </InfiniteScroll>
-      </div> 
+        > */}
+        {reviews.map(review => <ReviewItem key={review.Id} review={review} />)}
+        {/* </InfiniteScroll> */}
+      </div>
     );
   }
 }

@@ -1,16 +1,57 @@
-import { FETCH_REVIEWS } from './types';
+import {
+  FETCH_REVIEWS,
+  SET_REVIEWS,
+  SET_PAGINATION,
+  SET_REVIEW_TYPE,
+} from './types';
 import { getReviews } from '../api';
 
-// add more exports to get rid of the Eslint's prefer-default-export
-// eslint-disable-next-line import/prefer-default-export
-export function fetchReviews(options) {
-  return (dispatch) => {
-    getReviews(options)
+export function setReviews(reviews) {
+  return {
+    type: SET_REVIEWS,
+    payload: reviews,
+  };
+}
+
+export function setPagination(pagination) {
+  return {
+    type: SET_PAGINATION,
+    payload: pagination,
+  };
+}
+
+export function setReviewType(reviewType) {
+  return {
+    type: SET_REVIEW_TYPE,
+    payload: reviewType,
+  };
+}
+
+export function fetchReviews(revType) {
+  return (dispatch, getState) => {
+    let {
+      reviewType,
+      // eslint-disable-next-line prefer-const
+      pagination: { PageNumber, PageSize },
+    } = getState();
+
+    reviewType = revType !== undefined ? revType : reviewType;
+
+    getReviews({
+      reviewType,
+      page: PageNumber + 1,
+      pageSize: PageSize,
+    })
       .then((res) => {
-        debugger;
+        dispatch(setReviewType(reviewType));
+        dispatch(setReviews(res.data));
+        dispatch(setPagination(res.pagination));
       })
-      .catch((err) => {
-        debugger;
+      .catch(() => {
+        dispatch(setReviews([]));
+        dispatch(setPagination({
+          HasNextPage: false,
+        }));
       });
 
     return {

@@ -12339,7 +12339,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, ".app {\n  height: 100%;\n  overflow: hidden; }\n", ""]);
+exports.push([module.i, ".app {\n  height: 100%;\n  min-width: 320px; }\n", ""]);
 
 // exports
 
@@ -36723,20 +36723,59 @@ module.exports = function(originalModule) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.setReviews = setReviews;
+exports.setPagination = setPagination;
+exports.setReviewType = setReviewType;
 exports.fetchReviews = fetchReviews;
 
 var _types = __webpack_require__(/*! ./types */ "./src/actions/types.js");
 
 var _api = __webpack_require__(/*! ../api */ "./src/api.js");
 
-// add more exports to get rid of the Eslint's prefer-default-export
-// eslint-disable-next-line import/prefer-default-export
-function fetchReviews(options) {
-  return function (dispatch) {
-    (0, _api.getReviews)(options).then(function (res) {
-      debugger;
-    }).catch(function (err) {
-      debugger;
+function setReviews(reviews) {
+  return {
+    type: _types.SET_REVIEWS,
+    payload: reviews
+  };
+}
+
+function setPagination(pagination) {
+  return {
+    type: _types.SET_PAGINATION,
+    payload: pagination
+  };
+}
+
+function setReviewType(reviewType) {
+  return {
+    type: _types.SET_REVIEW_TYPE,
+    payload: reviewType
+  };
+}
+
+function fetchReviews(revType) {
+  return function (dispatch, getState) {
+    var _getState = getState(),
+        reviewType = _getState.reviewType,
+        _getState$pagination = _getState.pagination,
+        PageNumber = _getState$pagination.PageNumber,
+        PageSize = _getState$pagination.PageSize;
+
+    reviewType = revType !== undefined ? revType : reviewType;
+
+    (0, _api.getReviews)({
+      reviewType: reviewType,
+      page: PageNumber + 1,
+      pageSize: PageSize
+    }).then(function (res) {
+      dispatch(setReviewType(reviewType));
+      dispatch(setReviews(res.data));
+      dispatch(setPagination(res.pagination));
+    }).catch(function () {
+      dispatch(setReviews([]));
+      dispatch(setPagination({
+        HasNextPage: false
+      }));
     });
 
     return {
@@ -36760,9 +36799,13 @@ function fetchReviews(options) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-// add more exports to get rid of the Eslint's prefer-default-export
-// eslint-disable-next-line import/prefer-default-export
 var FETCH_REVIEWS = exports.FETCH_REVIEWS = 'FETCH_REVIEWS';
+
+var SET_REVIEWS = exports.SET_REVIEWS = 'SET_REVIEWS';
+
+var SET_REVIEW_TYPE = exports.SET_REVIEW_TYPE = 'SET_REVIEW_TYPE';
+
+var SET_PAGINATION = exports.SET_PAGINATION = 'SET_PAGINATION';
 
 /***/ }),
 
@@ -36823,8 +36866,6 @@ Object.defineProperty(exports, "__esModule", {
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
 var _react = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 
 var _react2 = _interopRequireDefault(_react);
@@ -36841,46 +36882,36 @@ __webpack_require__(/*! ./style */ "./src/components/App/style.scss");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
 
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+var App = function App(_ref) {
+  var fetchReviews = _ref.fetchReviews,
+      pagination = _ref.pagination,
+      reviews = _ref.reviews,
+      reviewType = _ref.reviewType,
+      reviewTypes = _ref.reviewTypes;
+  return _react2.default.createElement(
+    'div',
+    { className: 'app' },
+    _react2.default.createElement(_Header2.default, {
+      reviewType: reviewType,
+      reviewTypes: reviewTypes,
+      setReviewType: fetchReviews
+    }),
+    _react2.default.createElement(_Reviews2.default, {
+      fetchReviews: fetchReviews,
+      reviews: reviews,
+      pagination: pagination
+    })
+  );
+};
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+var _Header$propTypes = _Header2.default.propTypes,
+    setReviewType = _Header$propTypes.setReviewType,
+    restHeaderPropTypes = _objectWithoutProperties(_Header$propTypes, ['setReviewType']);
 
-var App = function (_React$PureComponent) {
-  _inherits(App, _React$PureComponent);
+App.propTypes = _extends({}, restHeaderPropTypes, _Reviews2.default.propTypes);
 
-  function App() {
-    _classCallCheck(this, App);
-
-    return _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).apply(this, arguments));
-  }
-
-  _createClass(App, [{
-    key: 'render',
-    value: function render() {
-      var _props = this.props,
-          selectedReviewType = _props.selectedReviewType,
-          fetchReviews = _props.fetchReviews,
-          reviews = _props.reviews;
-
-
-      return _react2.default.createElement(
-        'div',
-        { className: 'app' },
-        _react2.default.createElement(_Header2.default, { selectedReviewType: selectedReviewType }),
-        _react2.default.createElement(_Reviews2.default, {
-          reviews: reviews,
-          fetchReviews: fetchReviews
-        })
-      );
-    }
-  }]);
-
-  return App;
-}(_react2.default.PureComponent);
-
-App.propTypes = _extends({}, _Header2.default.propTypes, _Reviews2.default.propTypes);
 exports.default = App;
 
 /***/ }),
@@ -36929,11 +36960,17 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _react = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 
 var _react2 = _interopRequireDefault(_react);
+
+var _propTypes = __webpack_require__(/*! prop-types */ "./node_modules/prop-types/index.js");
+
+var _propTypes2 = _interopRequireDefault(_propTypes);
 
 __webpack_require__(/*! ./style */ "./src/components/Header/style.scss");
 
@@ -36945,25 +36982,74 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+var REVIEW_TYPES = {
+  0: 'Все',
+  1: 'Положительные',
+  2: 'Отрицательные'
+};
+
 var Header = function (_React$PureComponent) {
   _inherits(Header, _React$PureComponent);
 
   function Header() {
+    var _ref;
+
+    var _temp, _this, _ret;
+
     _classCallCheck(this, Header);
 
-    return _possibleConstructorReturn(this, (Header.__proto__ || Object.getPrototypeOf(Header)).apply(this, arguments));
+    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
+    return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = Header.__proto__ || Object.getPrototypeOf(Header)).call.apply(_ref, [this].concat(args))), _this), _this.handleReviewTypeClick = function (event) {
+      var reviewType = Number(event); // TODO: event.target.name
+
+      if (reviewType !== _this.props.reviewType) {
+        _this.props.setReviewType(reviewType);
+      }
+    }, _temp), _possibleConstructorReturn(_this, _ret);
   }
 
   _createClass(Header, [{
     key: 'render',
     value: function render() {
-      return 'header';
+      var _this2 = this;
+
+      var _props = this.props,
+          reviewType = _props.reviewType,
+          reviewTypes = _props.reviewTypes;
+
+
+      return _react2.default.createElement(
+        'div',
+        { className: 'app_header' },
+        Object.entries(reviewTypes).map(function (_ref2) {
+          var _ref3 = _slicedToArray(_ref2, 2),
+              key = _ref3[0],
+              value = _ref3[1];
+
+          return _react2.default.createElement(
+            'div',
+            { key: key, name: key, onClick: function onClick() {
+                return _this2.handleReviewTypeClick(key);
+              } },
+            value,
+            value === reviewType && ' selected'
+          );
+        })
+      );
     }
   }]);
 
   return Header;
 }(_react2.default.PureComponent);
 
+Header.propTypes = {
+  reviewType: _propTypes2.default.number.isRequired,
+  reviewTypes: _propTypes2.default.object.isRequired,
+  setReviewType: _propTypes2.default.func.isRequired
+};
 exports.default = Header;
 
 /***/ }),
@@ -37012,38 +37098,28 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
 var _react = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 
 var _react2 = _interopRequireDefault(_react);
 
+var _propTypes = __webpack_require__(/*! prop-types */ "./node_modules/prop-types/index.js");
+
+var _propTypes2 = _interopRequireDefault(_propTypes);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+var ReviewItem = function ReviewItem(_ref) {
+  var Message = _ref.review.Message;
+  return _react2.default.createElement(
+    'div',
+    { className: 'app__reviews__item' },
+    Message
+  );
+};
 
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var ReviewItem = function (_React$PureComponent) {
-  _inherits(ReviewItem, _React$PureComponent);
-
-  function ReviewItem() {
-    _classCallCheck(this, ReviewItem);
-
-    return _possibleConstructorReturn(this, (ReviewItem.__proto__ || Object.getPrototypeOf(ReviewItem)).apply(this, arguments));
-  }
-
-  _createClass(ReviewItem, [{
-    key: 'render',
-    value: function render() {
-      return 'review-item';
-    }
-  }]);
-
-  return ReviewItem;
-}(_react2.default.PureComponent);
+ReviewItem.propTypes = {
+  review: _propTypes2.default.object.isRequired
+};
 
 exports.default = ReviewItem;
 
@@ -37091,8 +37167,6 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var PAGE_SIZE = 10;
-
 var Reviews = function (_React$PureComponent) {
   _inherits(Reviews, _React$PureComponent);
 
@@ -37103,6 +37177,11 @@ var Reviews = function (_React$PureComponent) {
   }
 
   _createClass(Reviews, [{
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      this.props.fetchReviews();
+    }
+  }, {
     key: 'render',
     value: function render() {
       var reviews = this.props.reviews;
@@ -37111,17 +37190,9 @@ var Reviews = function (_React$PureComponent) {
       return _react2.default.createElement(
         'div',
         { className: 'app__reviews' },
-        _react2.default.createElement(
-          _reactInfiniteScrollComponent2.default,
-          {
-            dataLength: reviews.length
-            // next = this.fetchData
-            // hasMore // next page from pagind headers
-          },
-          reviews.map(function (review) {
-            return _react2.default.createElement(_ReviewItem2.default, { key: review.id, review: review });
-          })
-        )
+        reviews.map(function (review) {
+          return _react2.default.createElement(_ReviewItem2.default, { key: review.Id, review: review });
+        })
       );
     }
   }]);
@@ -37131,7 +37202,8 @@ var Reviews = function (_React$PureComponent) {
 
 Reviews.propTypes = {
   fetchReviews: _propTypes2.default.func.isRequired,
-  reviews: _propTypes2.default.array.isRequired
+  reviews: _propTypes2.default.array.isRequired,
+  pagination: _propTypes2.default.object.isRequired
 };
 exports.default = Reviews;
 
@@ -37187,7 +37259,7 @@ var _reactDom2 = _interopRequireDefault(_reactDom);
 
 var _reactRedux = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/es/index.js");
 
-var _store = __webpack_require__(/*! ./store */ "./src/store/index.js");
+var _store = __webpack_require__(/*! ./store */ "./src/store.js");
 
 var _store2 = _interopRequireDefault(_store);
 
@@ -37203,7 +37275,10 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function mapStateToProps(state) {
   return {
-    reviews: state.reviews
+    pagination: state.pagination,
+    reviews: state.reviews,
+    reviewType: state.reviewType,
+    reviewTypes: state.reviewTypes
   };
 }
 
@@ -37243,9 +37318,22 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _types = __webpack_require__(/*! ../actions/types */ "./src/actions/types.js");
 
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
 var initialState = {
   reviews: [],
-  isLoading: false
+  isLoading: false,
+  reviewType: 0,
+  reviewTypes: {
+    0: 'Все',
+    1: 'Положительные',
+    2: 'Отрицательные'
+  },
+  pagination: {
+    PageNumber: 0,
+    PageSize: 25,
+    HasNextPage: true
+  }
 };
 
 function rootReducer() {
@@ -37260,6 +37348,24 @@ function rootReducer() {
         isLoading: true
       });
 
+    case _types.SET_REVIEWS:
+      return _extends({}, state, {
+        reviews: [].concat(_toConsumableArray(state.reviews), _toConsumableArray(payload)),
+        isLoading: false
+      });
+
+    case _types.SET_REVIEW_TYPE:
+      return _extends({}, state, {
+        reviewType: payload,
+        pagination: payload === state.reviewType ? state.pagination : initialState.pagination,
+        reviews: payload === state.reviewType ? state.reviews : initialState.reviews
+      });
+
+    case _types.SET_PAGINATION:
+      return _extends({}, state, {
+        pagination: _extends({}, state.pagination, payload)
+      });
+
     default:
       return state;
   }
@@ -37269,10 +37375,10 @@ exports.default = rootReducer;
 
 /***/ }),
 
-/***/ "./src/store/index.js":
-/*!****************************!*\
-  !*** ./src/store/index.js ***!
-  \****************************/
+/***/ "./src/store.js":
+/*!**********************!*\
+  !*** ./src/store.js ***!
+  \**********************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -37289,7 +37395,7 @@ var _reduxThunk = __webpack_require__(/*! redux-thunk */ "./node_modules/redux-t
 
 var _reduxThunk2 = _interopRequireDefault(_reduxThunk);
 
-var _root = __webpack_require__(/*! ../reducers/root */ "./src/reducers/root.js");
+var _root = __webpack_require__(/*! ./reducers/root */ "./src/reducers/root.js");
 
 var _root2 = _interopRequireDefault(_root);
 
@@ -37339,7 +37445,7 @@ if(false) {}
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(/*! babel-polyfill */"./node_modules/babel-polyfill/lib/index.js");
-module.exports = __webpack_require__(/*! D:\work\misc\demo\laba4\chibbis-test\src/index.jsx */"./src/index.jsx");
+module.exports = __webpack_require__(/*! C:\work\chibbis-test\src/index.jsx */"./src/index.jsx");
 
 
 /***/ })

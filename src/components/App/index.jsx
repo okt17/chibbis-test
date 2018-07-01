@@ -3,29 +3,36 @@ import Reviews from '../Reviews';
 import Header from '../Header';
 import './style';
 
-class App extends React.PureComponent {
-  static propTypes = {
-    ...Header.propTypes,
-    ...Reviews.propTypes,
-  };
-  render() {
-    const {
-      selectedReviewType,
-      fetchReviews,
-      reviews,
-    } = this.props;
+const App = ({
+  fetchReviews,
+  pagination,
+  reviews,
+  reviewType,
+  reviewTypes,
+}) => (
+  <div className='app'>
+    <Header
+      reviewType={reviewType}
+      reviewTypes={reviewTypes}
+      setReviewType={fetchReviews}
+    />
 
-    return (
-      <div className='app'>
-        <Header selectedReviewType={selectedReviewType} />
+    <Reviews
+      fetchReviews={fetchReviews}
+      reviews={reviews}
+      pagination={pagination}
+    />
+  </div>
+);
 
-        <Reviews
-          reviews={reviews}
-          fetchReviews={fetchReviews}
-        />
-      </div>
-    );
-  }
-}
+const {
+  setReviewType,
+  ...restHeaderPropTypes
+} = Header.propTypes;
+
+App.propTypes = {
+  ...restHeaderPropTypes,
+  ...Reviews.propTypes,
+};
 
 export default App;

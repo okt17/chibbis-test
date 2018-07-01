@@ -8,7 +8,10 @@ import './style';
 
 function mapStateToProps(state) {
   return {
+    pagination: state.pagination,
     reviews: state.reviews,
+    reviewType: state.reviewType,
+    reviewTypes: state.reviewTypes,
   };
 }
 
