@@ -1,3 +1,16 @@
 .app__reviews {
+  flex: 1 1 auto;
+  overflow: auto;
+  padding: 0.5rem 1rem;
+  width: 100%;
 
+  &__comments {
+    // to override semantic ui css
+    max-width: 100% !important;
+  }
+
+  &__end-message {
+    width: 200px;
+    margin: 0 auto;
+  }
 }

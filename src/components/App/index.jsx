@@ -5,14 +5,15 @@ import './style';
 
 const App = ({
   fetchReviews,
+  isLoading,
   pagination,
   reviews,
-  reviewType,
   reviewTypes,
+  selectedReviewType,
 }) => (
   <div className='app'>
     <Header
-      reviewType={reviewType}
+      selectedReviewType={selectedReviewType}
       reviewTypes={reviewTypes}
       setReviewType={fetchReviews}
     />
@@ -21,6 +22,7 @@ const App = ({
       fetchReviews={fetchReviews}
       reviews={reviews}
       pagination={pagination}
+      isLoading={isLoading}
     />
   </div>
 );

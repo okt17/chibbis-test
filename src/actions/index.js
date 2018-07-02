@@ -1,61 +1,56 @@
 import {
   FETCH_REVIEWS,
   SET_REVIEWS,
-  SET_PAGINATION,
-  SET_REVIEW_TYPE,
 } from './types';
 import { getReviews } from '../api';
 
-export function setReviews(reviews) {
+export function setReviews(data) {
   return {
     type: SET_REVIEWS,
-    payload: reviews,
+    payload: data,
   };
 }
 
-export function setPagination(pagination) {
-  return {
-    type: SET_PAGINATION,
-    payload: pagination,
-  };
-}
-
-export function setReviewType(reviewType) {
-  return {
-    type: SET_REVIEW_TYPE,
-    payload: reviewType,
-  };
-}
-
-export function fetchReviews(revType) {
+export function fetchReviews(reviewType) {
   return (dispatch, getState) => {
     let {
-      reviewType,
+      selectedReviewType,
       // eslint-disable-next-line prefer-const
       pagination: { PageNumber, PageSize },
     } = getState();
 
-    reviewType = revType !== undefined ? revType : reviewType;
+    // при переключении типа отзывов начинаем листать с первой страницы
+    // иначе листаем на страницу дальше
+    const page = (
+      reviewType === selectedReviewType
+      ||
+      reviewType === undefined
+    ) ? PageNumber + 1 : 1;
+
+    selectedReviewType = reviewType !== undefined
+      ? reviewType
+      : selectedReviewType;
 
     getReviews({
-      reviewType,
-      page: PageNumber + 1,
+      reviewType: selectedReviewType,
+      page,
       pageSize: PageSize,
     })
-      .then((res) => {
-        dispatch(setReviewType(reviewType));
-        dispatch(setReviews(res.data));
-        dispatch(setPagination(res.pagination));
-      })
-      .catch(() => {
-        dispatch(setReviews([]));
-        dispatch(setPagination({
+      .then(res => dispatch(setReviews({
+        pagination: res.pagination,
+        reviews: res.data,
+        reviewType: selectedReviewType,
+      })))
+      .catch(() => dispatch(setReviews({
+        pagination: {
           HasNextPage: false,
-        }));
-      });
+        },
+        reviews: [],
+      })));
 
-    return {
+    dispatch({
       type: FETCH_REVIEWS,
-    };
+      payload: selectedReviewType,
+    });
   };
 }

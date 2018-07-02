@@ -1,42 +1,50 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Button } from 'semantic-ui-react';
 import './style';
-
-const REVIEW_TYPES = {
-  0: 'Все',
-  1: 'Положительные',
-  2: 'Отрицательные',
-};
 
 class Header extends React.PureComponent {
   static propTypes = {
-    reviewType: PropTypes.number.isRequired,
-    reviewTypes: PropTypes.object.isRequired,
+    selectedReviewType: PropTypes.number.isRequired,
+    reviewTypes: PropTypes.array.isRequired,
     setReviewType: PropTypes.func.isRequired,
   };
   handleReviewTypeClick = (event) => {
-    const reviewType = Number(event); // TODO: event.target.name
+    const reviewType = Number(event.target.name);
 
-    if (reviewType !== this.props.reviewType) {
+    if (reviewType !== this.props.selectedReviewType) {
       this.props.setReviewType(reviewType);
     }
   };
   render() {
     const {
-      reviewType,
+      selectedReviewType,
       reviewTypes,
     } = this.props;
 
     return (
-      <div className='app_header'>
-        {
-          Object.entries(reviewTypes).map(([key, value]) => (
-            <div key={key} name={key} onClick={() => this.handleReviewTypeClick(key)}>
-              {value}
-              {value === reviewType && ' selected'}
-            </div>
-          ))
-        }
+      <div className='app__header'>
+        <Button.Group>
+          {
+            reviewTypes.map(({ key, alias }, i, arr) => (
+              <React.Fragment key={key}>
+                <Button
+                  className='app__header__button'
+                  name={key}
+                  onClick={this.handleReviewTypeClick}
+                  primary={key === selectedReviewType}
+                > {alias}
+                </Button>
+
+                {
+                  i < arr.length - 1
+                  &&
+                  <Button.Or text='' />
+                }
+              </React.Fragment>
+            ))
+          }
+        </Button.Group>
       </div>
     );
   }

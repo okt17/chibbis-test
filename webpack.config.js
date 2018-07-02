@@ -1,9 +1,10 @@
-var
+const
   path = require('path'),
   CleanWebpackPlugin = require('clean-webpack-plugin'),
   WebpackNotifierPlugin = require('webpack-notifier'),
+  APP_DIR = path.resolve(__dirname, 'src'),
   BUILD_DIR = path.resolve(__dirname, 'build'),
-  APP_DIR = path.resolve(__dirname, 'src');
+  ROOT_DIR = path.resolve(__dirname);
 
 module.exports = (env, argv) => ({
   entry: [
@@ -35,6 +36,10 @@ module.exports = (env, argv) => ({
             loader: 'sass-loader'
           }
         ]
+      },
+      {
+        test: /\.png$/,
+        loader: 'url-loader?mimetype=image/png'
       }
     ]
   },
@@ -44,10 +49,11 @@ module.exports = (env, argv) => ({
   ],
   resolve: {
     alias: {
-      app: APP_DIR
+      app: APP_DIR,
+      root: ROOT_DIR,
     },
     enforceExtension: false,
-    extensions: ['.js', '.jsx', '.scss', '.json']
+    extensions: ['.js', '.jsx', '.scss', '.json', '.png']
   },
   devtool: (
     argv !== undefined // required for eslint

@@ -10,7 +10,7 @@ function mapStateToProps(state) {
   return {
     pagination: state.pagination,
     reviews: state.reviews,
-    reviewType: state.reviewType,
+    selectedReviewType: state.selectedReviewType,
     reviewTypes: state.reviewTypes,
   };
 }
